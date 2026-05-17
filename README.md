@@ -31,7 +31,7 @@ Creates a portal and preserves keyboard focus flow between the original DOM posi
 
 ```ts
 const portal = createPortal(source, container);
-// => { element: Element, cleanup: () => void }
+// => { element: Element; cleanup: () => void }
 //
 // source: Element
 // container (optional): Element (default: <body>)
