@@ -27,7 +27,7 @@ import { createPortal } from 'https://unpkg.com/@y14e/portal/dist/index.js';
 
 ### `createPortal`
 
-Creates a portal and preserves keyboard focus flow between the original DOM position and the portal.
+Creates a portal and preserves keyboard focus order between the original DOM position and the portal.
 
 ```ts
 const portal = createPortal(source, container);
