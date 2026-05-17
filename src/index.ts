@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 0.0.4
+ * @version 0.1.0
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -32,22 +32,19 @@ const VISUALLY_HIDDEN_CSS = `border: 0; clip: rect(0, 0, 0, 0); height: 1px; mar
 
 export function createPortal(
   source: Element,
-  container = document.body,
-): { element: Element; cleanup: () => void } {
+  target = document.body,
+): () => void {
   if (!(source instanceof Element)) {
     throw new Error('Invalid source element');
   }
 
-  if (!(container instanceof Element)) {
-    console.warn('Invalid container element. Fallback: <body> element.');
-    container = document.body;
+  if (!(target instanceof Element)) {
+    console.warn('Invalid target element. Fallback: <body> element.');
+    target = document.body;
   }
 
-  const portal = new Portal(source, container);
-  return {
-    element: portal.getElement(),
-    cleanup: () => portal.destroy(),
-  };
+  const portal = new Portal(source, target);
+  return () => portal.destroy();
 }
 
 // -----------------------------------------------------------------------------
@@ -56,20 +53,16 @@ export function createPortal(
 
 export class Portal {
   #source: Element;
-  #container: Element;
-  #target: HTMLElement;
+  #target: Element;
   #entranceSentinel: HTMLElement;
   #exitSentinel: HTMLElement;
   #tabIndexes = new WeakMap<Element, number | null>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
-  constructor(source: Element, container: Element) {
+  constructor(source: Element, target: Element) {
     this.#source = source;
-    this.#container = container;
-    this.#target = document.createElement('div');
-    this.#target.setAttribute('data-portal', '');
-    this.#target.setAttribute('tabindex', '-1');
+    this.#target = target;
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
     this.#initialize();
@@ -99,20 +92,15 @@ export class Portal {
     });
 
     this.#exitSentinel.after(this.#source);
-    this.#target.remove();
     this.#entranceSentinel.remove();
     this.#exitSentinel.remove();
-  }
-
-  getElement() {
-    return this.#target;
+    this.#source.removeAttribute('data-portal');
   }
 
   #initialize() {
     this.#source.before(this.#entranceSentinel);
     this.#entranceSentinel.after(this.#exitSentinel);
     this.#target.append(this.#source);
-    this.#container.append(this.#target);
 
     this.#getFocusables().forEach((focusable: Element) => {
       const index = focusable.getAttribute('tabindex')?.trim();
@@ -130,6 +118,7 @@ export class Portal {
       capture: true,
       signal,
     });
+    this.#source.setAttribute('data-portal', '');
   }
 
   #onFocusIn = (event: FocusEvent) => {

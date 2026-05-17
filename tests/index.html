@@ -26,8 +26,8 @@
 <script type="module">
 import { createPortal } from 'https://esm.sh/@y14e/portal';
 
-const { cleanup: cleanup1 } = createPortal(document.getElementById('my-portal-1'));
-const { cleanup: cleanup2 } = createPortal(document.getElementById('my-portal-2'));
+const cleanup1 = createPortal(document.getElementById('my-portal-1'));
+const cleanup2 = createPortal(document.getElementById('my-portal-2'));
 
 document.getElementById('revert1').addEventListener('click', () => {
   cleanup1();
