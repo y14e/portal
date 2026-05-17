@@ -1,7 +1,7 @@
 /**
  * Portal
  * Lightweight DOM portal (teleport) utility with fully focus management.
- * Designed for accessible dialogs, menus, overlays, popovers, and etc.
+ * Designed for accessible dialogs, menus, overlays, popovers.
  *
  * @version 0.0.4
  * @author Yusuke Kamiyamane
