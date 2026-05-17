@@ -18,7 +18,7 @@ import { createPortal } from '@y14e/portal';
 // CDNs
 import { createPortal } from 'https://esm.sh/@y14e/portal'
 // or
-import { createPortal } from 'https://cdn.jsdelivr.net/npm/@y14e/portal/dist/index.js';
+import { createPortal } from 'https://cdn.jsdelivr.net/npm/@y14e/portal/+esm';
 // or
 import { createPortal } from 'https://unpkg.com/@y14e/portal/dist/index.js';
 ```
