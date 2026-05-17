@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers, and etc.
  *
- * @version 0.0.2
+ * @version 0.0.3
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -63,6 +63,7 @@ export class Portal {
   #portal: HTMLElement;
   #entranceSentinel: HTMLElement;
   #exitSentinel: HTMLElement;
+  #focusables: Element[] = [];
   #tabIndexes = new WeakMap<Element, number | null>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
@@ -75,6 +76,7 @@ export class Portal {
     this.#portal.setAttribute('tabindex', '-1');
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
+    this.#focusables = getFocusables(this.#source, { composed: true });
     this.#initialize();
   }
 
@@ -87,7 +89,7 @@ export class Portal {
     this.#controller?.abort();
     this.#controller = null;
 
-    this.#getFocusables().forEach((focusable: Element) => {
+    this.#focusables.forEach((focusable: Element) => {
       const index = this.#tabIndexes.get(focusable);
 
       if (index === null) {
@@ -96,6 +98,7 @@ export class Portal {
         focusable.setAttribute('tabindex', String(index));
       }
     });
+    this.#focusables.length = 0;
 
     this.#exitSentinel.after(this.#source);
     this.#portal.remove();
@@ -113,13 +116,11 @@ export class Portal {
     this.#portal.append(this.#source);
     this.#container.append(this.#portal);
 
-    getFocusables(this.#source, { composed: true }).forEach(
-      (focusable: Element) => {
-        const index = focusable.getAttribute('tabindex')?.trim();
-        this.#tabIndexes.set(focusable, index === null ? null : Number(index));
-        focusable.setAttribute('tabindex', '-1');
-      },
-    );
+    this.#focusables.forEach((focusable: Element) => {
+      const index = focusable.getAttribute('tabindex')?.trim();
+      this.#tabIndexes.set(focusable, index === null ? null : Number(index));
+      focusable.setAttribute('tabindex', '-1');
+    });
 
     this.#controller = new AbortController();
     const { signal } = this.#controller;
@@ -141,20 +142,18 @@ export class Portal {
       return;
     }
 
-    const focusables = this.#getFocusables();
-
     if (current === this.#entranceSentinel) {
       if (this.#source.contains(before)) {
         this.#focusOutside('backward');
       } else {
-        const first = focusables[0];
+        const first = this.#focusables[0];
         first && focus(first);
       }
     } else if (current === this.#exitSentinel) {
       if (this.#source.contains(before)) {
         this.#focusOutside('forward');
       } else {
-        const last = focusables.at(-1);
+        const last = this.#focusables.at(-1);
         last && focus(last);
       }
     }
@@ -175,21 +174,19 @@ export class Portal {
       return;
     }
 
-    const focusables = this.#getFocusables();
-
-    if (!focusables.length) {
+    if (!this.#focusables.length) {
       event.preventDefault();
       (event.shiftKey ? this.#entranceSentinel : this.#exitSentinel).focus();
     }
 
-    const index = focusables.indexOf(active);
+    const index = this.#focusables.indexOf(active);
 
     if (index === -1) {
       return;
     }
 
     event.preventDefault();
-    const focusable = focusables[index + (event.shiftKey ? -1 : 1)];
+    const focusable = this.#focusables[index + (event.shiftKey ? -1 : 1)];
 
     if (focusable) {
       focus(focusable);
@@ -217,10 +214,6 @@ export class Portal {
         ? getPreviousFocusable(document.body, options)
         : getNextFocusable(document.body, options);
     focusable && focus(focusable);
-  }
-
-  #getFocusables() {
-    return getFocusables(this.#source, { composed: true });
   }
 }
 
