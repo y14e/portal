@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers, and etc.
  *
- * @version 0.0.3
+ * @version 0.0.4
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -33,10 +33,7 @@ const VISUALLY_HIDDEN_CSS = `border: 0; clip: rect(0, 0, 0, 0); height: 1px; mar
 export function createPortal(
   source: Element,
   container = document.body,
-): {
-  element: Element;
-  cleanup: () => void;
-} {
+): { element: Element; cleanup: () => void } {
   if (!(source instanceof Element)) {
     throw new Error('Invalid source element');
   }
@@ -60,23 +57,21 @@ export function createPortal(
 export class Portal {
   #source: Element;
   #container: Element;
-  #portal: HTMLElement;
+  #target: HTMLElement;
   #entranceSentinel: HTMLElement;
   #exitSentinel: HTMLElement;
-  #focusables: Element[] = [];
   #tabIndexes = new WeakMap<Element, number | null>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
-  constructor(source: Element, container = document.body) {
+  constructor(source: Element, container: Element) {
     this.#source = source;
     this.#container = container;
-    this.#portal = document.createElement('div');
-    this.#portal.setAttribute('data-portal', '');
-    this.#portal.setAttribute('tabindex', '-1');
+    this.#target = document.createElement('div');
+    this.#target.setAttribute('data-portal', '');
+    this.#target.setAttribute('tabindex', '-1');
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
-    this.#focusables = getFocusables(this.#source, { composed: true });
     this.#initialize();
   }
 
@@ -89,7 +84,11 @@ export class Portal {
     this.#controller?.abort();
     this.#controller = null;
 
-    this.#focusables.forEach((focusable: Element) => {
+    this.#getFocusables().forEach((focusable: Element) => {
+      if (!this.#tabIndexes.has(focusable)) {
+        return;
+      }
+
       const index = this.#tabIndexes.get(focusable);
 
       if (index === null) {
@@ -98,25 +97,24 @@ export class Portal {
         focusable.setAttribute('tabindex', String(index));
       }
     });
-    this.#focusables.length = 0;
 
     this.#exitSentinel.after(this.#source);
-    this.#portal.remove();
+    this.#target.remove();
     this.#entranceSentinel.remove();
     this.#exitSentinel.remove();
   }
 
   getElement() {
-    return this.#portal;
+    return this.#target;
   }
 
   #initialize() {
     this.#source.before(this.#entranceSentinel);
     this.#entranceSentinel.after(this.#exitSentinel);
-    this.#portal.append(this.#source);
-    this.#container.append(this.#portal);
+    this.#target.append(this.#source);
+    this.#container.append(this.#target);
 
-    this.#focusables.forEach((focusable: Element) => {
+    this.#getFocusables().forEach((focusable: Element) => {
       const index = focusable.getAttribute('tabindex')?.trim();
       this.#tabIndexes.set(focusable, index === null ? null : Number(index));
       focusable.setAttribute('tabindex', '-1');
@@ -146,14 +144,14 @@ export class Portal {
       if (this.#source.contains(before)) {
         this.#focusOutside('backward');
       } else {
-        const first = this.#focusables[0];
+        const first = this.#getFocusables()[0];
         first && focus(first);
       }
     } else if (current === this.#exitSentinel) {
       if (this.#source.contains(before)) {
         this.#focusOutside('forward');
       } else {
-        const last = this.#focusables.at(-1);
+        const last = this.#getFocusables().at(-1);
         last && focus(last);
       }
     }
@@ -174,19 +172,19 @@ export class Portal {
       return;
     }
 
-    if (!this.#focusables.length) {
+    if (!this.#getFocusables().length) {
       event.preventDefault();
       (event.shiftKey ? this.#entranceSentinel : this.#exitSentinel).focus();
     }
 
-    const index = this.#focusables.indexOf(active);
+    const index = this.#getFocusables().indexOf(active);
 
     if (index === -1) {
       return;
     }
 
     event.preventDefault();
-    const focusable = this.#focusables[index + (event.shiftKey ? -1 : 1)];
+    const focusable = this.#getFocusables()[index + (event.shiftKey ? -1 : 1)];
 
     if (focusable) {
       focus(focusable);
@@ -214,6 +212,13 @@ export class Portal {
         ? getPreviousFocusable(document.body, options)
         : getNextFocusable(document.body, options);
     focusable && focus(focusable);
+  }
+
+  #getFocusables() {
+    return getFocusables(this.#source, {
+      composed: true,
+      include: (element) => this.#tabIndexes.has(element),
+    });
   }
 }
 
