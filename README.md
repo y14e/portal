@@ -1,4 +1,4 @@
-# portal.ts
+# Portal
 
 Lightweight DOM portal (teleport) utility with fully focus management. Designed for accessible dialogs, menus, overlays, popovers, and etc.
 
@@ -23,12 +23,22 @@ import { createPortal } from 'https://cdn.jsdelivr.net/npm/y14e@portal/dist/inde
 import { createPortal } from 'https://unpkg.com/y14e@portal/dist/index.js';
 ```
 
-## Usage
+## 📦 APIs
+
+### `createPortal`
+
+Creates a portal and preserves keyboard focus flow between the original DOM position and the portal.
 
 ```ts
-import { createPortal } from '@y14e/portal';
-
-createPortal(source);
+const portal = createPortal(source, container);
 // => { element: Element, cleanup: () => void }
 //
 // source: Element
+// container (optional): Element (default: <body>)
+
+// Element
+console.log(portal.element);
+
+// Cleanup
+portal.cleanup();
+```
