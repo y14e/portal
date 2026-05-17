@@ -1,0 +1,58 @@
+{
+  "name": "@y14e/portal",
+  "version": "0.0.1",
+  "description": "Lightweight DOM portal (teleport) utility with fully focus management",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "a11y",
+    "accessibility",
+    "focus",
+    "focus-management",
+    "focusable",
+    "portal",
+    "shadow-dom",
+    "shadowdom",
+    "teleport",
+    "typescript",
+    "utility"
+  ],
+  "author": "Yusuke Kamiyamane",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y14e/portal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/y14e/portal/issues"
+  },
+  "homepage": "https://github.com/y14e/portal#readme",
+  "devDependencies": {
+    "bun-types": "latest",
+    "power-focusable": "^4.0.2",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
