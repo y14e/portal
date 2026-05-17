@@ -30,15 +30,9 @@ import { createPortal } from 'https://unpkg.com/@y14e/portal/dist/index.js';
 Creates a portal and preserves keyboard focus order between the original DOM and the portal.
 
 ```ts
-const portal = createPortal(source, container);
-// => { element: Element; cleanup: () => void }
+const cleanup = createPortal(source, target);
+// => () => void
 //
 // source: Element
-// container (optional): Element (default: <body>)
-
-// Element
-console.log(portal.element);
-
-// Cleanup
-portal.cleanup();
+// target (optional): Element (default: <body>)
 ```
