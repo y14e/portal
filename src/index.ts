@@ -43,8 +43,8 @@ export function createPortal(
     container = document.body;
   }
 
-  if (!containsComposed(container, host)) {
-    throw new Error('Host element not within container');
+  if (containsComposed(host, container)) {
+    throw new Error('Host element cannot contain container');
   }
 
   const portal = new Portal(host, container);
