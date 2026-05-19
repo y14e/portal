@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.0.2
+ * @version 1.0.3
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -44,7 +44,7 @@ export function createPortal(
   }
 
   if (!containsComposed(container, host)) {
-    throw new Error('Mismatch elements');
+    throw new Error('Host element not within container');
   }
 
   const portal = new Portal(host, container);
@@ -56,15 +56,20 @@ export function createPortal(
 // -----------------------------------------------------------------------------
 
 export class Portal {
-  #host: Element;
-  #container: Element;
-  #entranceSentinel: HTMLElement;
-  #exitSentinel: HTMLElement;
+  #host!: Element;
+  #container!: Element;
+  #entranceSentinel!: HTMLElement;
+  #exitSentinel!: HTMLElement;
   #tabIndexes = new WeakMap<Element, string | null>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
   constructor(host: Element, container: Element) {
+    if (host.hasAttribute('data-portaled')) {
+      console.warn('Already portaled');
+      return;
+    }
+
     this.#host = host;
     this.#container = container;
     this.#entranceSentinel = this.#createSentinel();
@@ -98,7 +103,7 @@ export class Portal {
     this.#exitSentinel.after(this.#host);
     this.#entranceSentinel.remove();
     this.#exitSentinel.remove();
-    this.#host.removeAttribute('data-portal');
+    this.#host.removeAttribute('data-portaled');
   }
 
   #initialize() {
@@ -121,7 +126,7 @@ export class Portal {
       capture: true,
       signal,
     });
-    this.#host.setAttribute('data-portal', '');
+    this.#host.setAttribute('data-portaled', '');
   }
 
   #onFocusIn = (event: FocusEvent) => {
