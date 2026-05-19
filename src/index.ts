@@ -193,6 +193,7 @@ export class Portal {
   #createSentinel() {
     const sentinel = document.createElement('span');
     sentinel.setAttribute('aria-hidden', 'true');
+    sentinel.setAttribute('data-portal-sentinel', '');
     sentinel.setAttribute('tabindex', '0');
     sentinel.style.cssText += VISUALLY_HIDDEN_CSS;
     return sentinel;
