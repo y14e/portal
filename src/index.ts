@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.0.3
+ * @version 1.0.4
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -35,7 +35,13 @@ export function createPortal(
   container = document.body,
 ): () => void {
   if (!(host instanceof Element)) {
-    throw new Error('Invalid host element');
+    console.warn('Invalid host element');
+    return () => {};
+  }
+
+  if (host.hasAttribute('data-portaled')) {
+    console.warn('Already portaled');
+    return () => {};
   }
 
   if (!(container instanceof Element)) {
@@ -44,7 +50,8 @@ export function createPortal(
   }
 
   if (containsComposed(host, container)) {
-    throw new Error('Host element cannot contain container');
+    console.warn('Host element cannot contain the container element');
+    return () => {};
   }
 
   const portal = new Portal(host, container);
@@ -65,11 +72,6 @@ export class Portal {
   #isDestroyed = false;
 
   constructor(host: Element, container: Element) {
-    if (host.hasAttribute('data-portaled')) {
-      console.warn('Already portaled');
-      return;
-    }
-
     this.#host = host;
     this.#container = container;
     this.#entranceSentinel = this.#createSentinel();
@@ -139,14 +141,14 @@ export class Portal {
 
     if (current === this.#entranceSentinel) {
       if (this.#host.contains(before)) {
-        this.#moveFocusOutside('previous');
+        this.#moveFocus('previous');
       } else {
         const first = this.#getFocusables()[0];
         first && focus(first);
       }
     } else if (current === this.#exitSentinel) {
       if (this.#host.contains(before)) {
-        this.#moveFocusOutside('next');
+        this.#moveFocus('next');
       } else {
         const last = this.#getFocusables().at(-1);
         last && focus(last);
@@ -206,7 +208,7 @@ export class Portal {
     });
   }
 
-  #moveFocusOutside(direction: 'previous' | 'next') {
+  #moveFocus(direction: 'previous' | 'next') {
     const options = {
       anchor:
         direction === 'previous' ? this.#entranceSentinel : this.#exitSentinel,
