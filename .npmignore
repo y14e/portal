@@ -3,4 +3,4 @@ tests
 .github
 tsconfig.json
 tsup.config.ts
-update-dependencies.bat
+update_dependencies.bat
