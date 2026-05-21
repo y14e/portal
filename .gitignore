@@ -3,3 +3,4 @@ dist
 .DS_Store
 *.log
 update-dependencies.bat
+update-dependencies.bat
