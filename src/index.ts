@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.0.5
+ * @version 1.0.6
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -79,7 +79,7 @@ export class Portal {
     this.#initialize();
   }
 
-  destroy() {
+  destroy(): void {
     if (this.#isDestroyed) {
       return;
     }
@@ -108,7 +108,7 @@ export class Portal {
     this.#host.removeAttribute('data-portaled');
   }
 
-  #initialize() {
+  #initialize(): void {
     this.#host.before(this.#entranceSentinel);
     this.#entranceSentinel.after(this.#exitSentinel);
     this.#container.append(this.#host);
@@ -131,7 +131,7 @@ export class Portal {
     this.#host.setAttribute('data-portaled', '');
   }
 
-  #onFocusIn = (event: FocusEvent) => {
+  #onFocusIn = (event: FocusEvent): void => {
     const current = event.target;
     const before = event.relatedTarget;
 
@@ -156,7 +156,7 @@ export class Portal {
     }
   };
 
-  #onKeyDown = (event: KeyboardEvent) => {
+  #onKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== 'Tab' || event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
@@ -192,7 +192,7 @@ export class Portal {
     }
   };
 
-  #createSentinel() {
+  #createSentinel(): HTMLSpanElement {
     const sentinel = document.createElement('span');
     sentinel.setAttribute('aria-hidden', 'true');
     sentinel.setAttribute('data-portal-sentinel', '');
@@ -201,14 +201,14 @@ export class Portal {
     return sentinel;
   }
 
-  #getFocusables() {
+  #getFocusables(): Element[] {
     return getFocusables(this.#host, {
       composed: true,
       include: (element) => this.#tabIndexes.has(element),
     });
   }
 
-  #moveFocus(direction: 'previous' | 'next') {
+  #moveFocus(direction: 'previous' | 'next'): void {
     const options = {
       anchor:
         direction === 'previous' ? this.#entranceSentinel : this.#exitSentinel,
@@ -226,7 +226,7 @@ export class Portal {
 // Utils
 // -----------------------------------------------------------------------------
 
-function containsComposed(container: Node, element: Node) {
+function containsComposed(container: Node, element: Node): boolean {
   let current: Node | null = element;
 
   while (current) {
@@ -245,11 +245,11 @@ function containsComposed(container: Node, element: Node) {
   return false;
 }
 
-function focusElement(element: Element) {
+function focusElement(element: Element): void {
   'focus' in element && typeof element.focus === 'function' && element.focus();
 }
 
-function getActiveElement() {
+function getActiveElement(): Element | null {
   let current = document.activeElement;
 
   while (current?.shadowRoot?.activeElement) {
