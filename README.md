@@ -36,3 +36,7 @@ const cleanup = createPortal(host, container);
 // host: Element
 // container (optional): Element (default: <body>)
 ```
+
+## Demo
+
+https://y14e.github.io/portal/
