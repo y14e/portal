@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.3
+ * @version 1.2.4
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -14,6 +14,7 @@
 // Imports
 // -----------------------------------------------------------------------------
 
+import { restoreAttributes, saveAttributes } from '@y14e/attributes-utils';
 import {
   getFocusables,
   getNextFocusable,
@@ -68,7 +69,6 @@ class Portal {
   #entranceSentinel!: HTMLElement;
   #exitSentinel!: HTMLElement;
   #focusables = new Set<Element>();
-  #tabIndexes = new Map<Element, string | null>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
@@ -88,19 +88,8 @@ class Portal {
     this.#isDestroyed = true;
     this.#controller?.abort();
     this.#controller = null;
-
-    this.#focusables.forEach((focusable) => {
-      const index = this.#tabIndexes.get(focusable);
-
-      if (index == null) {
-        focusable.removeAttribute('tabindex');
-      } else {
-        focusable.setAttribute('tabindex', index);
-      }
-    });
-
+    restoreAttributes([...this.#focusables]);
     this.#focusables.clear();
-    this.#tabIndexes.clear();
     this.#exitSentinel.after(this.#host);
     this.#entranceSentinel.remove();
     this.#exitSentinel.remove();
@@ -207,17 +196,10 @@ class Portal {
       }
 
       if (focusable.isConnected) {
-        const index = this.#tabIndexes.get(focusable);
-
-        if (index == null) {
-          focusable.removeAttribute('tabindex');
-        } else {
-          focusable.setAttribute('tabindex', index);
-        }
+        restoreAttributes([focusable]);
       }
 
       this.#focusables.delete(focusable);
-      this.#tabIndexes.delete(focusable);
     });
 
     // Added
@@ -227,7 +209,7 @@ class Portal {
       }
 
       this.#focusables.add(c);
-      this.#tabIndexes.set(c, c.getAttribute('tabindex'));
+      saveAttributes([c], ['tabindex']);
       c.setAttribute('tabindex', '-1');
     });
   }
