@@ -179,14 +179,14 @@ class Portal {
   };
 
   #update(): void {
-    const current = new Set([
+    const focusables = new Set([
       ...this.#getFocusables(),
       ...getFocusables(this.#host, { composed: true }),
     ]);
 
     // Removed
     for (const focusable of this.#focusables) {
-      if (current.has(focusable)) {
+      if (focusables.has(focusable)) {
         continue;
       }
 
@@ -198,14 +198,14 @@ class Portal {
     }
 
     // Added
-    for (const c of current) {
-      if (this.#focusables.has(c)) {
+    for (const focusable of focusables) {
+      if (this.#focusables.has(focusable)) {
         continue;
       }
 
-      this.#focusables.add(c);
-      saveAttributes([c], ['tabindex']);
-      c.setAttribute('tabindex', '-1');
+      this.#focusables.add(focusable);
+      saveAttributes([focusable], ['tabindex']);
+      focusable.setAttribute('tabindex', '-1');
     }
   }
 
