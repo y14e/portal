@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.8
+ * @version 1.2.9
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -125,19 +125,24 @@ class Portal {
     if (current === this.#entranceSentinel) {
       if (this.#host.contains(before)) {
         this.#moveFocus('previous');
-      } else {
-        this.#update();
-        const first = [...this.#focusables][0];
-        first && focusElement(first);
+        return;
       }
-    } else if (current === this.#exitSentinel) {
+
+      this.#update();
+      const first = [...this.#focusables][0];
+      first && focusElement(first);
+      return;
+    }
+
+    if (current === this.#exitSentinel) {
       if (this.#host.contains(before)) {
         this.#moveFocus('next');
-      } else {
-        this.#update();
-        const last = [...this.#focusables].at(-1);
-        last && focusElement(last);
+        return;
       }
+
+      this.#update();
+      const last = [...this.#focusables].at(-1);
+      last && focusElement(last);
     }
   };
 
