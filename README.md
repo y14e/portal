@@ -10,14 +10,14 @@ npm i @y14e/portal
 
 ```ts
 // npm
-import { createPortal } from '@y14e/portal@1.2.11';
+import { createPortal } from '@y14e/portal@1.2.12';
 
 // CDNs
-import { createPortal } from 'https://esm.sh/@y14e/portal@1.2.11';
+import { createPortal } from 'https://esm.sh/@y14e/portal@1.2.12';
 // or
-import { createPortal } from 'https://cdn.jsdelivr.net/npm/@y14e/portal@1.2.11/+esm';
+import { createPortal } from 'https://cdn.jsdelivr.net/npm/@y14e/portal@1.2.12/+esm';
 // or
-import { createPortal } from 'https://esm.unpkg.com/@y14e/portal@1.2.11';
+import { createPortal } from 'https://esm.unpkg.com/@y14e/portal@1.2.12';
 ```
 
 ## 📦 APIs
