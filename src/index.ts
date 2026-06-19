@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.14
+ * @version 1.2.15
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -194,21 +194,18 @@ class Portal {
     this.#update();
     const focusables = this.#getFocusables();
 
-    if (!focusables.length) {
+    if (focusables.length) {
+      const index = focusables.indexOf(active);
+
+      if (index !== -1) {
+        event.preventDefault();
+        const focusable = focusables[index + (shiftKey ? -1 : 1)];
+        focusable ? focusElement(focusable) : this.#focusSentinel(shiftKey);
+      }
+    } else {
       event.preventDefault();
       this.#moveFocus(shiftKey ? 'previous' : 'next');
-      return;
     }
-
-    const index = focusables.indexOf(active);
-
-    if (index === -1) {
-      return;
-    }
-
-    event.preventDefault();
-    const focusable = focusables[index + (shiftKey ? -1 : 1)];
-    focusable ? focusElement(focusable) : this.#focusSentinel(shiftKey);
   };
 
   #update(): void {
@@ -219,23 +216,19 @@ class Portal {
 
     // Removed
     for (const focusable of this.#focusables) {
-      if (current.has(focusable)) {
-        continue;
+      if (!current.has(focusable)) {
+        focusable.isConnected && restoreAttributes([focusable]);
+        this.#focusables.delete(focusable);
       }
-
-      focusable.isConnected && restoreAttributes([focusable]);
-      this.#focusables.delete(focusable);
     }
 
     // Added
     for (const focusable of current) {
-      if (this.#focusables.has(focusable)) {
-        continue;
+      if (!this.#focusables.has(focusable)) {
+        this.#focusables.add(focusable);
+        saveAttributes([focusable], ['tabindex']);
+        focusable.setAttribute('tabindex', '-1');
       }
-
-      this.#focusables.add(focusable);
-      saveAttributes([focusable], ['tabindex']);
-      focusable.setAttribute('tabindex', '-1');
     }
   }
 
