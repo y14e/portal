@@ -1,6 +1,6 @@
 {
   "name": "@y14e/portal",
-  "version": "1.2.17",
+  "version": "1.2.18",
   "description": "Lightweight DOM portal (teleport) utility with fully focus management",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@y14e/attributes-utils": "^1.1.2",
     "bun-types": "latest",
-    "power-focusable": "^4.3.3",
+    "power-focusable": "^4.3.4",
     "tsup": "^8.0.0",
     "typescript": "^5.6.0"
   },
