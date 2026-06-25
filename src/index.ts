@@ -239,6 +239,7 @@ class Portal {
   }
 
   #focusSentinel(isPrevious: boolean): void {
+    // DO NOT REMOVE: This RAF is required for consecutive jumps.
     this.#timer && cancelAnimationFrame(this.#timer);
     this.#timer = requestAnimationFrame(() =>
       (isPrevious ? this.#entranceSentinel : this.#exitSentinel).focus(),
