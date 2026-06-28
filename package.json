@@ -1,6 +1,6 @@
 {
   "name": "@y14e/portal",
-  "version": "1.2.24",
+  "version": "1.2.25",
   "description": "Lightweight DOM portal (teleport) utility with fully focus management",
   "type": "module",
   "main": "./dist/index.cjs",
