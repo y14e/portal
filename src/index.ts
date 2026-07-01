@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.26
+ * @version 1.2.27
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -113,20 +113,28 @@ class Portal {
     this.#update();
     this.#controller = new AbortController();
     const { signal } = this.#controller;
-    document.addEventListener('focusin', this.#onFocusIn, { signal });
-    document.addEventListener('keydown', this.#onKeyDown, { signal });
+
+    [this.#entranceSentinel, this.#exitSentinel].forEach((sentinel) => {
+      sentinel.addEventListener('focus', this.#onFocus, { signal });
+    });
+
+    if (!(this.#host instanceof HTMLElement)) {
+      return;
+    }
+
+    this.#host.addEventListener('keydown', this.#onKeyDown, { signal });
     this.#host.setAttribute('data-portaled', '');
   }
 
-  #onFocusIn = (event: FocusEvent): void => {
-    const current = event.target;
+  #onFocus = (event: FocusEvent): void => {
+    const sentinel = event.target;
     const previous = event.relatedTarget;
 
     if (!(previous instanceof Element)) {
       return;
     }
 
-    if (current === this.#entranceSentinel) {
+    if (sentinel === this.#entranceSentinel) {
       if (this.#host.contains(previous)) {
         this.#moveFocus('previous');
         return;
@@ -144,7 +152,7 @@ class Portal {
         });
         next && focusElement(next);
       }
-    } else if (current === this.#exitSentinel) {
+    } else {
       if (this.#host.contains(previous)) {
         this.#moveFocus('next');
         return;
@@ -175,10 +183,6 @@ class Portal {
     const active = getActiveElement();
 
     if (!(active instanceof Element)) {
-      return;
-    }
-
-    if (!this.#host.contains(active)) {
       return;
     }
 
