@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.28
+ * @version 1.2.29
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -63,8 +63,8 @@ export function createPortal(
 class Portal {
   #host: Element;
   #container: Element;
-  #entranceSentinel: HTMLElement;
-  #exitSentinel: HTMLElement;
+  #entranceSentinel: HTMLSpanElement;
+  #exitSentinel: HTMLSpanElement;
   #focusables = new Set<Element>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
@@ -111,10 +111,6 @@ class Portal {
       sentinel.addEventListener('focus', this.#onFocus, { signal });
     });
 
-    if (!(this.#host instanceof HTMLElement)) {
-      return;
-    }
-
     this.#host.addEventListener('keydown', this.#onKeyDown, { signal });
     this.#host.setAttribute('data-portaled', '');
   }
@@ -148,7 +144,11 @@ class Portal {
     }
   };
 
-  #onKeyDown = (event: KeyboardEvent): void => {
+  #onKeyDown = (event: Event): void => {
+    if (!(event instanceof KeyboardEvent)) {
+      return;
+    }
+
     const { key, altKey, ctrlKey, metaKey, shiftKey } = event;
 
     if (key !== 'Tab' || altKey || ctrlKey || metaKey) {
