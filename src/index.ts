@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.27
+ * @version 1.2.28
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -67,7 +67,6 @@ class Portal {
   #exitSentinel: HTMLElement;
   #focusables = new Set<Element>();
   #controller: AbortController | null = null;
-  #timer: number | undefined;
   #isDestroyed = false;
 
   constructor(host: Element, container: Element) {
@@ -92,12 +91,6 @@ class Portal {
     this.#isDestroyed = true;
     this.#controller?.abort();
     this.#controller = null;
-
-    if (this.#timer !== undefined) {
-      cancelAnimationFrame(this.#timer);
-      this.#timer = undefined;
-    }
-
     restoreAttributes([...this.#focusables]);
     this.#focusables.clear();
     this.#exitSentinel.after(this.#host);
@@ -142,16 +135,7 @@ class Portal {
 
       this.#update();
       const first = [...this.#focusables][0];
-
-      if (first) {
-        focusElement(first);
-      } else {
-        const next = getNextFocusable(document.body, {
-          anchor: this.#exitSentinel,
-          composed: true,
-        });
-        next && focusElement(next);
-      }
+      first ? focusElement(first) : this.#moveFocus('next');
     } else {
       if (this.#host.contains(previous)) {
         this.#moveFocus('next');
@@ -160,16 +144,7 @@ class Portal {
 
       this.#update();
       const last = [...this.#focusables].at(-1);
-
-      if (last) {
-        focusElement(last);
-      } else {
-        const previous = getPreviousFocusable(document.body, {
-          anchor: this.#entranceSentinel,
-          composed: true,
-        });
-        previous && focusElement(previous);
-      }
+      last ? focusElement(last) : this.#moveFocus('previous');
     }
   };
 
@@ -237,15 +212,7 @@ class Portal {
   }
 
   #focusSentinel(isPrevious: boolean): void {
-    const sentinel = isPrevious ? this.#entranceSentinel : this.#exitSentinel;
-
-    if (isPrevious) {
-      sentinel.focus();
-    } else {
-      // DO NOT REMOVE: This RAF is required for consecutive jumps.
-      this.#timer && cancelAnimationFrame(this.#timer);
-      this.#timer = requestAnimationFrame(() => sentinel.focus());
-    }
+    (isPrevious ? this.#entranceSentinel : this.#exitSentinel).focus();
   }
 
   #getFocusables(): Element[] {
