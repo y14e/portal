@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.2.32
+ * @version 1.3.0
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -24,6 +24,14 @@ import {
 } from 'power-focusable';
 
 // -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
+
+export interface PortalOptions {
+  noInlineStyle: boolean;
+}
+
+// -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
 
@@ -36,6 +44,7 @@ const VISUALLY_HIDDEN_CSS = `border: 0; clip: rect(0, 0, 0, 0); height: 1px; mar
 export function createPortal(
   host: Element,
   container = document.body,
+  options: Partial<PortalOptions> = {},
 ): () => void {
   if (!(host instanceof Element)) {
     console.warn('Invalid host element');
@@ -52,7 +61,7 @@ export function createPortal(
     return () => {};
   }
 
-  const portal = new Portal(host, container);
+  const portal = new Portal(host, container, options);
   return () => portal.destroy();
 }
 
@@ -63,13 +72,18 @@ export function createPortal(
 class Portal {
   #host: Element;
   #container: Element;
+  #settings: PortalOptions;
   #entranceSentinel: HTMLSpanElement;
   #exitSentinel: HTMLSpanElement;
   #focusables = new Set<Element>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
-  constructor(host: Element, container: Element) {
+  constructor(
+    host: Element,
+    container: Element,
+    options: Partial<PortalOptions> = {},
+  ) {
     this.#host = host;
 
     if (!(container instanceof Element)) {
@@ -78,6 +92,14 @@ class Portal {
     }
 
     this.#container = container;
+    let { noInlineStyle = false } = options;
+
+    if (typeof noInlineStyle !== 'boolean') {
+      console.warn('Invalid noInlineStyle option. Fallback: false.');
+      noInlineStyle = false;
+    }
+
+    this.#settings = { noInlineStyle };
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
     this.#initialize();
@@ -206,7 +228,11 @@ class Portal {
     sentinel.setAttribute('aria-hidden', 'true');
     sentinel.setAttribute('data-portal-sentinel', '');
     sentinel.setAttribute('tabindex', '0');
-    sentinel.style.cssText += VISUALLY_HIDDEN_CSS;
+
+    if (!this.#settings.noInlineStyle) {
+      sentinel.style.cssText += VISUALLY_HIDDEN_CSS;
+    }
+
     return sentinel;
   }
 
