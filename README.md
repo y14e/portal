@@ -27,11 +27,20 @@ import { createPortal } from 'https://esm.unpkg.com/@y14e/portal@1.2.32';
 Creates a portal and preserves keyboard focus order between the original DOM and the portal.
 
 ```ts
-const cleanup = createPortal(host, container);
+const cleanup = createPortal(host, container, options);
 // => () => void
 //
 // host: Element
 // container (optional): Element (default: <body>)
+// options (optional): PortalOptions
+```
+
+## 🪄 Options
+
+```ts
+interface PortalOptions {
+  noInlineStyle: boolean; // default: false
+}
 ```
 
 ## Demo
