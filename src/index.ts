@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.3.0
+ * @version 1.3.1
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -14,14 +14,8 @@
 // Imports
 // -----------------------------------------------------------------------------
 
-import { restoreAttributes, saveAttributes } from '@y14e/attributes-utils';
-import {
-  focusElement,
-  getActiveElement,
-  getFocusables,
-  getNextFocusable,
-  getPreviousFocusable,
-} from 'power-focusable';
+import * as util from '@y14e/attribute-util';
+import * as pf from 'power-focusable';
 
 // -----------------------------------------------------------------------------
 // Types
@@ -113,7 +107,7 @@ class Portal {
     this.#isDestroyed = true;
     this.#controller?.abort();
     this.#controller = null;
-    restoreAttributes([...this.#focusables]);
+    util.restoreAttributes([...this.#focusables]);
     this.#focusables.clear();
     this.#exitSentinel.after(this.#host);
     this.#entranceSentinel.remove();
@@ -152,7 +146,7 @@ class Portal {
 
       this.#update();
       const first = [...this.#focusables][0];
-      first ? focusElement(first) : this.#moveFocus('next');
+      first ? pf.focusElement(first) : this.#moveFocus('next');
     } else {
       if (this.#host.contains(previous)) {
         this.#moveFocus('next');
@@ -161,7 +155,7 @@ class Portal {
 
       this.#update();
       const last = [...this.#focusables].at(-1);
-      last ? focusElement(last) : this.#moveFocus('previous');
+      last ? pf.focusElement(last) : this.#moveFocus('previous');
     }
   };
 
@@ -176,14 +170,14 @@ class Portal {
       return;
     }
 
-    const active = getActiveElement();
+    const active = pf.getActiveElement();
 
     if (!(active instanceof Element)) {
       return;
     }
 
     this.#update();
-    const focusables = this.#getFocusables();
+    const focusables = pf.getFocusables(this.#host);
 
     if (focusables.length) {
       const index = focusables.indexOf(active);
@@ -191,7 +185,7 @@ class Portal {
       if (index >= 0) {
         event.preventDefault();
         const focusable = focusables[index + (shiftKey ? -1 : 1)];
-        focusable ? focusElement(focusable) : this.#focusSentinel(shiftKey);
+        focusable ? pf.focusElement(focusable) : this.#focusSentinel(shiftKey);
       }
     } else {
       event.preventDefault();
@@ -202,13 +196,13 @@ class Portal {
   #update(): void {
     const current = new Set([
       ...this.#getFocusables(),
-      ...getFocusables(this.#host, { composed: true }),
+      ...pf.getFocusables(this.#host, { composed: true }),
     ]);
 
     // Removed
     for (const focusable of this.#focusables) {
       if (!current.has(focusable)) {
-        restoreAttributes(focusable);
+        util.restoreAttributes(focusable);
         this.#focusables.delete(focusable);
       }
     }
@@ -217,7 +211,7 @@ class Portal {
     for (const focusable of current) {
       if (!this.#focusables.has(focusable)) {
         this.#focusables.add(focusable);
-        saveAttributes(focusable, 'tabindex');
+        util.saveAttributes(focusable, 'tabindex');
         focusable.setAttribute('tabindex', '-1');
       }
     }
@@ -241,7 +235,7 @@ class Portal {
   }
 
   #getFocusables(): Element[] {
-    return getFocusables(this.#host, {
+    return pf.getFocusables(this.#host, {
       composed: true,
       include: (element: Element) => this.#focusables.has(element),
     });
@@ -255,9 +249,9 @@ class Portal {
     };
     const focusable =
       direction === 'previous'
-        ? getPreviousFocusable(document.body, options)
-        : getNextFocusable(document.body, options);
-    focusable && focusElement(focusable);
+        ? pf.getPreviousFocusable(document.body, options)
+        : pf.getNextFocusable(document.body, options);
+    focusable && pf.focusElement(focusable);
   }
 }
 
