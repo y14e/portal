@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.3.6
+ * @version 1.3.7
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -29,7 +29,8 @@ export interface PortalOptions {
 // Constants
 // -----------------------------------------------------------------------------
 
-const VISUALLY_HIDDEN_CSS = `border: 0; clip: rect(0, 0, 0, 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; user-select: none; white-space: nowrap; width: 1px;`;
+const VISUALLY_HIDDEN_CSS =
+  'border: 0; clip: rect(0, 0, 0, 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; user-select: none; white-space: nowrap; width: 1px;';
 
 // -----------------------------------------------------------------------------
 // APIs
@@ -116,8 +117,8 @@ class Portal {
     this.#controller = new AbortController();
     const { signal } = this.#controller;
 
-    for (const sentinel of [this.#entranceSentinel, this.#exitSentinel]) {
-      sentinel.addEventListener('focus', this.#onFocus, { signal });
+    for (const s of [this.#entranceSentinel, this.#exitSentinel]) {
+      s.addEventListener('focus', this.#onFocus, { signal });
     }
 
     this.#host.addEventListener('keydown', this.#onKeyDown, { signal });
@@ -193,19 +194,19 @@ class Portal {
     ]);
 
     // Removed
-    for (const focusable of this.#focusables) {
-      if (!current.has(focusable)) {
-        utils.restoreAttributes(focusable);
-        this.#focusables.delete(focusable);
+    for (const f of this.#focusables) {
+      if (!current.has(f)) {
+        utils.restoreAttributes(f);
+        this.#focusables.delete(f);
       }
     }
 
     // Added
-    for (const focusable of current) {
-      if (!this.#focusables.has(focusable)) {
-        this.#focusables.add(focusable);
-        utils.saveAttributes(focusable, 'tabindex');
-        focusable.setAttribute('tabindex', '-1');
+    for (const f of current) {
+      if (!this.#focusables.has(f)) {
+        this.#focusables.add(f);
+        utils.saveAttributes(f, 'tabindex');
+        f.setAttribute('tabindex', '-1');
       }
     }
   }

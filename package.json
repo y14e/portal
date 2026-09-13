@@ -1,6 +1,6 @@
 {
   "name": "@y14e/portal",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "Lightweight DOM portal (teleport) utility with fully focus management",
   "keywords": [
     "a11y",
@@ -58,7 +58,7 @@
     "esbuild": true
   },
   "dependencies": {
-    "@y14e/attribute-utils": "^2.0.10",
-    "power-focusable": "^4.3.30"
+    "@y14e/attribute-utils": "^2.0.11",
+    "power-focusable": "^4.3.31"
   }
 }
