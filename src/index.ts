@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.3.7
+ * @version 1.3.8
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -117,8 +117,8 @@ class Portal {
     this.#controller = new AbortController();
     const { signal } = this.#controller;
 
-    for (const s of [this.#entranceSentinel, this.#exitSentinel]) {
-      s.addEventListener('focus', this.#onFocus, { signal });
+    for (const sentinel of [this.#entranceSentinel, this.#exitSentinel]) {
+      sentinel.addEventListener('focus', this.#onFocus, { signal });
     }
 
     this.#host.addEventListener('keydown', this.#onKeyDown, { signal });
@@ -194,19 +194,19 @@ class Portal {
     ]);
 
     // Removed
-    for (const f of this.#focusables) {
-      if (!current.has(f)) {
-        utils.restoreAttributes(f);
-        this.#focusables.delete(f);
+    for (const focusable of this.#focusables) {
+      if (!current.has(focusable)) {
+        utils.restoreAttributes(focusable);
+        this.#focusables.delete(focusable);
       }
     }
 
     // Added
-    for (const f of current) {
-      if (!this.#focusables.has(f)) {
-        this.#focusables.add(f);
-        utils.saveAttributes(f, 'tabindex');
-        f.setAttribute('tabindex', '-1');
+    for (const focusable of current) {
+      if (!this.#focusables.has(focusable)) {
+        this.#focusables.add(focusable);
+        utils.saveAttributes(focusable, 'tabindex');
+        focusable.setAttribute('tabindex', '-1');
       }
     }
   }
