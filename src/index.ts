@@ -94,7 +94,7 @@ class Portal {
     }
 
     this.#container = container;
-    this.#settings = resolveOptions(options);
+    this.#settings = this.#resolveOptions(options);
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
     this.#initialize();
@@ -254,19 +254,15 @@ class Portal {
         : getNextFocusable(document.body, options);
     focusable && focusElement(focusable);
   }
-}
 
-// -----------------------------------------------------------------------------
-// Utils
-// -----------------------------------------------------------------------------
+  #resolveOptions(options: Partial<PortalOptions>): PortalOptions {
+    let { noInlineStyle = false } = options;
 
-function resolveOptions(options: Partial<PortalOptions>): PortalOptions {
-  let { noInlineStyle = false } = options;
+    if (typeof noInlineStyle !== 'boolean') {
+      console.warn('Invalid noInlineStyle option. Fallback: false.');
+      noInlineStyle = false;
+    }
 
-  if (typeof noInlineStyle !== 'boolean') {
-    console.warn('Invalid noInlineStyle option. Fallback: false.');
-    noInlineStyle = false;
+    return { noInlineStyle };
   }
-
-  return { noInlineStyle };
 }
