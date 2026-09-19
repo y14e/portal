@@ -3,7 +3,7 @@
  * Lightweight DOM portal (teleport) utility with fully focus management.
  * Designed for accessible dialogs, menus, overlays, popovers.
  *
- * @version 1.4.0
+ * @version 1.4.1
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -16,6 +16,7 @@
 
 import { restoreAttributes, saveAttributes } from '@y14e/attribute-utils';
 import {
+  containsComposed,
   focusElement,
   getActiveElement,
   getFocusables,
@@ -258,25 +259,6 @@ class Portal {
 // -----------------------------------------------------------------------------
 // Utils
 // -----------------------------------------------------------------------------
-
-function containsComposed(container: Node, element: Node): boolean {
-  let current: Node | null = element;
-
-  while (current) {
-    if (current === container) {
-      return true;
-    }
-
-    current =
-      current instanceof ShadowRoot
-        ? current.mode === 'open'
-          ? current.host
-          : null
-        : current.parentNode;
-  }
-
-  return false;
-}
 
 function resolveOptions(options: Partial<PortalOptions>): PortalOptions {
   let { noInlineStyle = false } = options;
