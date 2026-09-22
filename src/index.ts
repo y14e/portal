@@ -1,19 +1,3 @@
-/**
- * Portal
- * Lightweight DOM portal (teleport) utility with fully focus management.
- * Designed for accessible dialogs, menus, overlays, popovers.
- *
- * @version 1.4.1
- * @author Yusuke Kamiyamane
- * @license MIT
- * @copyright Copyright (c) Yusuke Kamiyamane
- * @see {@link https://github.com/y14e/portal}
- */
-
-// -----------------------------------------------------------------------------
-// Imports
-// -----------------------------------------------------------------------------
-
 import { restoreAttributes, saveAttributes } from '@y14e/attribute-utils';
 import {
   containsComposed,
@@ -24,24 +8,12 @@ import {
   getPreviousFocusable,
 } from 'power-focusable';
 
-// -----------------------------------------------------------------------------
-// Types
-// -----------------------------------------------------------------------------
-
 export interface PortalOptions {
   noInlineStyle: boolean;
 }
 
-// -----------------------------------------------------------------------------
-// Constants
-// -----------------------------------------------------------------------------
-
 const VISUALLY_HIDDEN_CSS =
   'border: 0; clip: rect(0, 0, 0, 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; user-select: none; white-space: nowrap; width: 1px;';
-
-// -----------------------------------------------------------------------------
-// APIs
-// -----------------------------------------------------------------------------
 
 export function createPortal(
   host: Element,
