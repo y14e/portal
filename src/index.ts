@@ -120,16 +120,17 @@ class Portal {
       this.#update();
       const first = [...this.#focusables][0];
       first ? focusElement(first) : this.#moveFocus('next');
-    } else {
-      if (this.#host.contains(previous)) {
-        this.#moveFocus('next');
-        return;
-      }
-
-      this.#update();
-      const last = [...this.#focusables].at(-1);
-      last ? focusElement(last) : this.#moveFocus('previous');
+      return;
     }
+
+    if (this.#host.contains(previous)) {
+      this.#moveFocus('next');
+      return;
+    }
+
+    this.#update();
+    const last = [...this.#focusables].at(-1);
+    last ? focusElement(last) : this.#moveFocus('previous');
   };
 
   #onKeyDown = (event: Event): void => {
@@ -160,10 +161,12 @@ class Portal {
         const focusable = focusables[index + (shiftKey ? -1 : 1)];
         focusable ? focusElement(focusable) : this.#focusSentinel(shiftKey);
       }
-    } else {
-      event.preventDefault();
-      this.#moveFocus(shiftKey ? 'previous' : 'next');
+
+      return;
     }
+
+    event.preventDefault();
+    this.#moveFocus(shiftKey ? 'previous' : 'next');
   };
 
   #update(): void {
