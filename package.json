@@ -46,6 +46,10 @@
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
+  "dependencies": {
+    "@y14e/attribute-utils": "^2.0.15",
+    "power-focusable": "^4.4.10"
+  },
   "devDependencies": {
     "bun-types": "latest",
     "tsup": "^8.0.0",
@@ -56,9 +60,5 @@
   },
   "allowScripts": {
     "esbuild": true
-  },
-  "dependencies": {
-    "@y14e/attribute-utils": "^2.0.15",
-    "power-focusable": "^4.4.10"
   }
 }
