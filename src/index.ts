@@ -39,10 +39,6 @@ export function createPortal(
   return () => portal.destroy();
 }
 
-// -----------------------------------------------------------------------------
-// Core
-// -----------------------------------------------------------------------------
-
 class Portal {
   #host: Element;
   #container: Element;
