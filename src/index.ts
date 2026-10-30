@@ -49,11 +49,7 @@ class Portal {
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
-  constructor(
-    host: Element,
-    container: Element,
-    options: Partial<PortalOptions> = {},
-  ) {
+  constructor(host: Element, container: Element, options: Partial<PortalOptions> = {}) {
     this.#host = host;
 
     if (!(container instanceof Element)) {
@@ -96,9 +92,7 @@ class Portal {
       sentinel.addEventListener('focus', this.#onFocus, { signal });
     }
 
-    (this.#host as HTMLElement).addEventListener('keydown', this.#onKeyDown, {
-      signal,
-    });
+    (this.#host as HTMLElement).addEventListener('keydown', this.#onKeyDown, { signal });
     this.#host.setAttribute('data-portaled', '');
   }
 
@@ -213,8 +207,7 @@ class Portal {
 
   #moveFocus(direction: 'previous' | 'next'): void {
     const options = {
-      anchor:
-        direction === 'previous' ? this.#entranceSentinel : this.#exitSentinel,
+      anchor: direction === 'previous' ? this.#entranceSentinel : this.#exitSentinel,
       composed: true,
     };
     const focusable =
