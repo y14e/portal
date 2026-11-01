@@ -7,13 +7,9 @@ import {
   getNextFocusable,
   getPreviousFocusable,
 } from 'power-focusable';
-
-export interface PortalOptions {
-  noInlineStyle: boolean;
-}
-
-const VISUALLY_HIDDEN_CSS =
-  'border: 0; clip: rect(0, 0, 0, 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; user-select: none; white-space: nowrap; width: 1px;';
+import { VISUALLY_HIDDEN_CSS } from './constants';
+import { resolveOptions } from './options';
+import type { PortalOptions } from './types';
 
 export function createPortal(
   host: Element,
@@ -58,7 +54,7 @@ class Portal {
     }
 
     this.#container = container;
-    this.#settings = this.#resolveOptions(options);
+    this.#settings = resolveOptions(options);
     this.#entranceSentinel = this.#createSentinel();
     this.#exitSentinel = this.#createSentinel();
     this.#initialize();
@@ -97,13 +93,13 @@ class Portal {
   }
 
   #onFocus = (event: FocusEvent): void => {
-    const { currentTarget: sentinel, relatedTarget: previous } = event;
+    const { currentTarget: target, relatedTarget: previous } = event;
 
     if (!(previous instanceof Element)) {
       return;
     }
 
-    if (sentinel === this.#entranceSentinel) {
+    if (target === this.#entranceSentinel) {
       if (this.#host.contains(previous)) {
         this.#moveFocus('previous');
         return;
@@ -215,16 +211,5 @@ class Portal {
         ? getPreviousFocusable(document.body, options)
         : getNextFocusable(document.body, options);
     focusable && focusElement(focusable);
-  }
-
-  #resolveOptions(options: Partial<PortalOptions>): PortalOptions {
-    let { noInlineStyle = false } = options;
-
-    if (typeof noInlineStyle !== 'boolean') {
-      console.warn('Invalid noInlineStyle option. Fallback: false.');
-      noInlineStyle = false;
-    }
-
-    return { noInlineStyle };
   }
 }

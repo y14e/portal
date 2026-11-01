@@ -1,6 +1,6 @@
 {
   "name": "@y14e/portal",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Lightweight DOM portal (teleport) utility with fully focus management",
   "keywords": [
     "a11y",
@@ -46,10 +46,6 @@
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {
-    "@y14e/attribute-utils": "^2.0.15",
-    "power-focusable": "^4.4.10"
-  },
   "devDependencies": {
     "bun-types": "latest",
     "tsup": "^8.0.0",
@@ -60,5 +56,9 @@
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "dependencies": {
+    "@y14e/attribute-utils": "^2.0.18",
+    "power-focusable": "^4.5.6"
   }
 }
