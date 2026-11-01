@@ -9,12 +9,12 @@ import {
 } from 'power-focusable';
 import { VISUALLY_HIDDEN_CSS } from './constants';
 import { resolveOptions } from './options';
-import type { PortalOptions } from './types';
+import type { PortalOptions as Options } from './types';
 
 export function createPortal(
   host: Element,
   container = document.body,
-  options: Partial<PortalOptions> = {},
+  options: Partial<Options> = {},
 ): () => void {
   if (!(host instanceof Element)) {
     console.warn('Invalid host element');
@@ -38,14 +38,14 @@ export function createPortal(
 class Portal {
   #host: Element;
   #container: Element;
-  #settings: PortalOptions;
+  #settings: Options;
   #entranceSentinel: HTMLSpanElement;
   #exitSentinel: HTMLSpanElement;
   #focusables = new Set<Element>();
   #controller: AbortController | null = null;
   #isDestroyed = false;
 
-  constructor(host: Element, container: Element, options: Partial<PortalOptions> = {}) {
+  constructor(host: Element, container: Element, options: Partial<Options> = {}) {
     this.#host = host;
 
     if (!(container instanceof Element)) {
@@ -213,3 +213,5 @@ class Portal {
     focusable && focusElement(focusable);
   }
 }
+
+export type { Options as PortalOptions };
