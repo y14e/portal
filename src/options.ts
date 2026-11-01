@@ -1,6 +1,6 @@
-import type { PortalOptions } from './types';
+import type { PortalOptions as Options } from './types';
 
-export function resolveOptions(options: Partial<PortalOptions>): PortalOptions {
+export function resolveOptions(options: Partial<Options>): Options {
   let { noInlineStyle = false } = options;
 
   if (typeof noInlineStyle !== 'boolean') {
