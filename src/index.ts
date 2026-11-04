@@ -88,7 +88,7 @@ class Portal {
       sentinel.addEventListener('focus', this.#onFocus, { signal });
     }
 
-    (this.#host as HTMLElement).addEventListener('keydown', this.#onKeyDown, { signal });
+    this.#host.addEventListener('keydown', this.#onKeyDown, { signal });
     this.#host.setAttribute('data-portaled', '');
   }
 
@@ -121,7 +121,11 @@ class Portal {
     last ? focusElement(last) : this.#moveFocus('previous');
   };
 
-  #onKeyDown = (event: KeyboardEvent): void => {
+  #onKeyDown = (event: Event): void => {
+    if (!(event instanceof KeyboardEvent)) {
+      return;
+    }
+
     const { key, altKey, ctrlKey, metaKey, shiftKey } = event;
 
     if (key !== 'Tab' || altKey || ctrlKey || metaKey) {
