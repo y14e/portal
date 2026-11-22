@@ -199,10 +199,7 @@ class Portal {
   }
 
   #getFocusables(): Element[] {
-    return getFocusables(this.#host, {
-      composed: true,
-      include: (element: Element) => this.#focusables.has(element),
-    });
+    return getFocusables(this.#host, { composed: true, include: (e) => this.#focusables.has(e) });
   }
 
   #moveFocus(isPrevious: boolean): void {
