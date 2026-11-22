@@ -101,24 +101,24 @@ class Portal {
 
     if (target === this.#entranceSentinel) {
       if (this.#host.contains(previous)) {
-        this.#moveFocus('previous');
+        this.#moveFocus(true);
         return;
       }
 
       this.#update();
       const first = [...this.#focusables][0];
-      first ? focusElement(first) : this.#moveFocus('next');
+      first ? focusElement(first) : this.#moveFocus(false);
       return;
     }
 
     if (this.#host.contains(previous)) {
-      this.#moveFocus('next');
+      this.#moveFocus(false);
       return;
     }
 
     this.#update();
     const last = [...this.#focusables].at(-1);
-    last ? focusElement(last) : this.#moveFocus('previous');
+    last ? focusElement(last) : this.#moveFocus(true);
   };
 
   #onKeyDown = (event: Event): void => {
@@ -154,7 +154,7 @@ class Portal {
     }
 
     event.preventDefault();
-    this.#moveFocus(shiftKey ? 'previous' : 'next');
+    this.#moveFocus(shiftKey);
   };
 
   #update(): void {
@@ -205,15 +205,11 @@ class Portal {
     });
   }
 
-  #moveFocus(direction: 'previous' | 'next'): void {
-    const options = {
-      anchor: direction === 'previous' ? this.#entranceSentinel : this.#exitSentinel,
+  #moveFocus(isPrevious: boolean): void {
+    const focusable = (isPrevious ? getPreviousFocusable : getNextFocusable)(document.body, {
+      anchor: isPrevious ? this.#entranceSentinel : this.#exitSentinel,
       composed: true,
-    };
-    const focusable =
-      direction === 'previous'
-        ? getPreviousFocusable(document.body, options)
-        : getNextFocusable(document.body, options);
+    });
     focusable && focusElement(focusable);
   }
 }
